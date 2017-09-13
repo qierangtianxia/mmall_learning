@@ -49,7 +49,7 @@ public class UserController {
 
     @RequestMapping(value = "register.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> register(@RequestBody User user) {
+    public ServerResponse<String> register(User user) {
         return iUserService.register(user);
     }
 
@@ -83,18 +83,18 @@ public class UserController {
 
     @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetResetPassword(String username, String newPassword, String forgetToken) {
-        return iUserService.forgetResetPassword(username, newPassword, forgetToken);
+    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        return iUserService.forgetResetPassword(username, passwordNew, forgetToken);
     }
 
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session, String oldPassword, String newPassword) {
+    public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
         User user = (User) session.getAttribute(CURRENT_USER);
         if (user == null) {
             return ServerResponse.createErrorResponse("用户未登录");
         }
-        return iUserService.resetPassword(newPassword, oldPassword, user);
+        return iUserService.resetPassword(passwordNew, passwordOld, user);
     }
 
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)

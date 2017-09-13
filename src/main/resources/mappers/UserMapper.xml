@@ -186,16 +186,16 @@
         AND answer = #{answer}
     </select>
 
-    <select id="updatePasswordByUsername" resultType="int" parameterType="map">
+    <update id="updatePasswordByUsername" parameterType="map">
         UPDATE mmall_user
         SET password = #{newPassword},
         update_time = now()
         WHERE username = #{username}
-    </select>
+    </update>
 
     <select id="checkPassword" resultType="int" parameterType="map">
         SELECT
-        count(1) mmall_user
+        count(1) FROM  mmall_user
         WHERE id = #{userId}
         AND password = #{password}
     </select>

@@ -100,13 +100,16 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public ServerResponse<String> checkAnswer(String username, String question, String answer) {
+        if (checkValid(username, Const.USERNAME).isSuccess()) {
+            return ServerResponse.createErrorResponse("用户名不存在");
+        }
         if (userMapper.checkAnswer(username, question, answer) > 0) {
             //当前用户问题和答案匹配成功
             String forgetToken = UUID.randomUUID().toString();
             TokenCache.put(TOKEN_PREFIX + username, forgetToken);
             return ServerResponse.createSuccessResponse(forgetToken);
         }
-        return ServerResponse.createErrorResponse("答案错误");
+        return ServerResponse.createErrorResponse("问题或答案错误");
     }
 
     @Override
@@ -120,12 +123,13 @@ public class UserServiceImpl implements IUserService {
         }
 
         String token = TokenCache.get(TOKEN_PREFIX + username);
-        if (StringUtils.isBlank(forgetToken) || StringUtils.equals(token, forgetToken)) {
+        if (StringUtils.isBlank(forgetToken) || !StringUtils.equals(token, forgetToken)) {
             return ServerResponse.createErrorResponse("token无效");
         }
 
         newPassword = MD5Util.MD5(newPassword);
-        if (userMapper.updatePasswordByUsername(username, newPassword) > 0) {
+        int result = userMapper.updatePasswordByUsername(username, newPassword);
+        if (result > 0) {
             return ServerResponse.createSuccessResponse("密码修改成功");
         }
         return ServerResponse.createErrorResponse("密码修改失败，请重试");
