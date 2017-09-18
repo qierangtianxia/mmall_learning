@@ -10,25 +10,14 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
-import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
-import com.mmall.dao.CartMapper;
-import com.mmall.dao.OrderItemMapper;
-import com.mmall.dao.OrderMapper;
-import com.mmall.dao.PayInfoMapper;
-import com.mmall.dao.ProductMapper;
-import com.mmall.dao.ShippingMapper;
-import com.mmall.pojo.Cart;
-import com.mmall.pojo.Order;
-import com.mmall.pojo.OrderItem;
-import com.mmall.pojo.PayInfo;
-import com.mmall.pojo.Product;
-import com.mmall.pojo.Shipping;
+import com.mmall.dao.*;
+import com.mmall.pojo.*;
 import com.mmall.service.IOrderService;
 import com.mmall.util.BigDecimalUtil;
 import com.mmall.util.DateTimeUtil;
@@ -48,11 +37,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by geely
@@ -91,7 +76,7 @@ public class OrderServiceImpl implements IOrderService {
     private ShippingMapper shippingMapper;
 
 
-    public  ServerResponse createOrder(Integer userId,Integer shippingId){
+    public ServerResponse createOrder(Integer userId, Integer shippingId){
 
         //从购物车中获取数据
         List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
@@ -132,7 +117,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
-    private OrderVo assembleOrderVo(Order order,List<OrderItem> orderItemList){
+    private OrderVo assembleOrderVo(Order order, List<OrderItem> orderItemList){
         OrderVo orderVo = new OrderVo();
         orderVo.setOrderNo(order.getOrderNo());
         orderVo.setPayment(order.getPayment());
@@ -217,7 +202,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private Order assembleOrder(Integer userId,Integer shippingId,BigDecimal payment){
+    private Order assembleOrder(Integer userId, Integer shippingId, BigDecimal payment){
         Order order = new Order();
         long orderNo = this.generateOrderNo();
         order.setOrderNo(orderNo);
@@ -253,7 +238,7 @@ public class OrderServiceImpl implements IOrderService {
         return payment;
     }
 
-    private ServerResponse getCartOrderItem(Integer userId,List<Cart> cartList){
+    private ServerResponse getCartOrderItem(Integer userId, List<Cart> cartList){
         List<OrderItem> orderItemList = Lists.newArrayList();
         if(CollectionUtils.isEmpty(cartList)){
             return ServerResponse.createByErrorMessage("购物车为空");
@@ -288,7 +273,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
-    public ServerResponse<String> cancel(Integer userId,Long orderNo){
+    public ServerResponse<String> cancel(Integer userId, Long orderNo){
         Order order  = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
         if(order == null){
             return ServerResponse.createByErrorMessage("该用户此订单不存在");
@@ -335,7 +320,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    public ServerResponse<OrderVo> getOrderDetail(Integer userId,Long orderNo){
+    public ServerResponse<OrderVo> getOrderDetail(Integer userId, Long orderNo){
         Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
         if(order != null){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo,userId);
@@ -346,7 +331,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    public ServerResponse<PageInfo> getOrderList(Integer userId,int pageNum,int pageSize){
+    public ServerResponse<PageInfo> getOrderList(Integer userId, int pageNum, int pageSize){
         PageHelper.startPage(pageNum,pageSize);
         List<Order> orderList = orderMapper.selectByUserId(userId);
         List<OrderVo> orderVoList = assembleOrderVoList(orderList,userId);
@@ -356,7 +341,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
 
-    private List<OrderVo> assembleOrderVoList(List<Order> orderList,Integer userId){
+    private List<OrderVo> assembleOrderVoList(List<Order> orderList, Integer userId){
         List<OrderVo> orderVoList = Lists.newArrayList();
         for(Order order : orderList){
             List<OrderItem>  orderItemList = Lists.newArrayList();
@@ -393,7 +378,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
-    public ServerResponse pay(Long orderNo,Integer userId,String path){
+    public ServerResponse pay(Long orderNo, Integer userId, String path){
         Map<String ,String> resultMap = Maps.newHashMap();
         Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
         if(order == null){
@@ -559,7 +544,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
-    public ServerResponse queryOrderPayStatus(Integer userId,Long orderNo){
+    public ServerResponse queryOrderPayStatus(Integer userId, Long orderNo){
         Order order = orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
         if(order == null){
             return ServerResponse.createByErrorMessage("用户没有该订单");
@@ -585,7 +570,7 @@ public class OrderServiceImpl implements IOrderService {
 
     //backend
 
-    public ServerResponse<PageInfo> manageList(int pageNum,int pageSize){
+    public ServerResponse<PageInfo> manageList(int pageNum, int pageSize){
         PageHelper.startPage(pageNum,pageSize);
         List<Order> orderList = orderMapper.selectAllOrder();
         List<OrderVo> orderVoList = this.assembleOrderVoList(orderList,null);
@@ -607,7 +592,7 @@ public class OrderServiceImpl implements IOrderService {
 
 
 
-    public ServerResponse<PageInfo> manageSearch(Long orderNo,int pageNum,int pageSize){
+    public ServerResponse<PageInfo> manageSearch(Long orderNo, int pageNum, int pageSize){
         PageHelper.startPage(pageNum,pageSize);
         Order order = orderMapper.selectByOrderNo(orderNo);
         if(order != null){
