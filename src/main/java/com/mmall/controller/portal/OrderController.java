@@ -35,7 +35,6 @@ public class OrderController {
     @Autowired
     private IOrderService iOrderService;
 
-
     @RequestMapping("create.do")
     @ResponseBody
     public ServerResponse create(HttpSession session, Integer shippingId){

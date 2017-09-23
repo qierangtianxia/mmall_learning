@@ -19,5 +19,10 @@ springmvc上传文件
     <input type="submit" value="富文本图片上传文件" />
 </form>
 
+<form name="form2" action="/user/login.do" method="post">
+    <input name="username" value="admin"/>
+    <input name="password" value="admin"/>
+    <input type="submit" value="管理员登陆" />
+</form>
 </body>
 </html>
